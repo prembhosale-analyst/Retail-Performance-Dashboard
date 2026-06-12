@@ -1,0 +1,238 @@
+# 🛒 Retail Performance Dashboard — Power BI
+
+![Power BI](https://img.shields.io/badge/Power%20BI-F2C811?style=for-the-badge&logo=powerbi&logoColor=black)
+![DAX](https://img.shields.io/badge/DAX-0078D4?style=for-the-badge&logo=microsoft&logoColor=white)
+![Status](https://img.shields.io/badge/Status-Completed-brightgreen?style=for-the-badge)
+
+An end-to-end **Retail Performance Dashboard** built in Power BI, designed to give business stakeholders a 360° view of Sales, Customer behaviour, and Product performance — all in one interactive report.
+
+---
+
+## 📌 Project Overview
+
+Retail businesses generate enormous amounts of transactional data daily. This dashboard transforms raw retail data into clear, actionable insights — enabling faster decisions on pricing, inventory, and customer strategy.
+
+| Area | Key Focus |
+|---|---|
+| 💰 Sales | Revenue trends, MoM growth, regional performance |
+| 👥 Customer | Segmentation, retention, top customers by value |
+| 📦 Product | Best/worst sellers, category contribution, profit margins |
+
+---
+
+## 📊 Dashboard Preview
+
+> 📁 The Power BI file (`.pbix`) is available in this repository.
+> Download and open in **Power BI Desktop** to explore the full interactive dashboard.
+
+> 💡 Don't have Power BI? View the screenshots below for a full walkthrough of the dashboard.
+
+### Sales Overview
+![Sales Overview](Screenshots/sales_overview.png)
+
+### Customer Analysis
+![Customer Analysis](Screenshots/customer_analysis.png)
+
+### Product Performance
+![Product Performance](Screenshots/product_performance.png)
+
+---
+
+## 🎯 Business Questions Answered
+
+- Which products and categories are driving the most revenue?
+- Who are our top customers and what is their buying behaviour?
+- How is sales performance trending month-over-month and year-over-year?
+- Which regions/stores are underperforming?
+- What is the contribution of each product category to total profit?
+
+---
+
+## 🖥️ Dashboard Pages
+
+### Page 1 — Sales Overview
+- Total Revenue, Total Orders, Average Order Value (KPI cards)
+- Monthly Revenue Trend (line chart)
+- Sales by Region (map / bar chart)
+- YoY and MoM Growth %
+
+### Page 2 — Customer Analysis
+- Total Customers, New vs Returning Customers
+- Customer Segmentation (High / Mid / Low value)
+- Top 10 Customers by Revenue
+- Purchase Frequency Distribution
+
+### Page 3 — Product Performance
+- Top 10 Products by Revenue and Profit
+- Category-wise Sales Contribution (donut / bar chart)
+- Product Profitability Matrix
+- Slow-moving / Low-performing Products
+
+---
+
+## ⚙️ DAX Measures Used
+
+```dax
+-- Total Revenue
+Total Revenue = SUM(Sales[Amount])
+
+-- Total Orders
+Total Orders = COUNTROWS(Sales)
+
+-- Average Order Value
+Avg Order Value = DIVIDE([Total Revenue], [Total Orders])
+
+-- Sales Last Year
+Sales LY = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR(Date[Date]))
+
+-- Year-over-Year Growth
+YoY Growth % =
+DIVIDE([Total Revenue] - [Sales LY], [Sales LY])
+
+-- Month-over-Month Growth
+MoM Growth % =
+VAR CurrentMonth = [Total Revenue]
+VAR PrevMonth    = CALCULATE([Total Revenue], PREVIOUSMONTH(Date[Date]))
+RETURN DIVIDE(CurrentMonth - PrevMonth, PrevMonth)
+
+-- Year-to-Date Sales
+Sales YTD = TOTALYTD([Total Revenue], Date[Date])
+
+-- % of Total Sales
+% of Total Sales = DIVIDE([Total Revenue], CALCULATE([Total Revenue], ALL(Sales)))
+
+-- Customer Segmentation
+Customer Segment =
+VAR Revenue = [Total Revenue]
+RETURN
+    IF(Revenue >= 50000, "High Value",
+    IF(Revenue >= 20000, "Mid Value", "Low Value"))
+
+-- Top 10 Customers Flag
+Is Top 10 Customer =
+IF(
+    RANKX(ALL(Customer[CustomerID]), [Total Revenue], , DESC, DENSE) <= 10,
+    "Top 10", "Others"
+)
+```
+
+---
+
+## 🗂️ Data Model
+
+The dashboard follows a **Star Schema** design for optimal performance:
+
+```
+         Date Table
+              |
+Customers ── Fact Sales ── Products
+              |
+           Regions
+```
+
+| Table | Type | Description |
+|---|---|---|
+| Fact_Sales | Fact | Core transactions — orders, revenue, quantity |
+| Dim_Customer | Dimension | Customer details and segments |
+| Dim_Product | Dimension | Product names, categories, cost/price |
+| Dim_Date | Dimension | Calendar table with Year, Month, Quarter |
+| Dim_Region | Dimension | Store / geographic data |
+
+---
+
+## 🗂️ Dataset
+
+| Field | Description |
+|---|---|
+| Order ID | Unique transaction identifier |
+| Order Date | Date of purchase |
+| Customer ID | Unique customer identifier |
+| Product | Product name and category |
+| Region | Geographic location |
+| Sales Amount | Revenue per transaction |
+| Quantity | Units sold |
+| Profit | Profit per transaction |
+
+> **Dataset Source:** [Mention your source — e.g. Kaggle Sample Superstore / UCI Repository / Internal]
+
+---
+
+## 🛠️ Tools & Technologies
+
+| Tool | Purpose |
+|---|---|
+| Power BI Desktop | Report building and data modelling |
+| DAX | Custom measures, KPIs, and calculated columns |
+| Power Query (M) | Data cleaning and transformation |
+| Star Schema | Data model design |
+
+---
+
+## 📁 Repository Structure
+
+```
+Retail-Performance-Dashboard/
+│
+├── 📊 Retail_Performance_Dashboard.pbix   # Main Power BI file
+├── 📁 Dataset/
+│   └── retail_data.csv                    # Source dataset
+├── 📁 Screenshots/
+│   ├── sales_overview.png                 # Page 1 screenshot
+│   ├── customer_analysis.png              # Page 2 screenshot
+│   └── product_performance.png            # Page 3 screenshot
+├── 📄 README.md                           # Project documentation
+└── 📄 DAX_Measures.md                     # All DAX measures with explanations
+```
+
+---
+
+## 🚀 How to Use
+
+1. **Clone** or **download** this repository
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Retail-Performance-Dashboard.git
+   ```
+2. Open `Retail_Performance_Dashboard.pbix` in **Power BI Desktop**
+3. If needed, update the data source path:
+   - Go to **Transform Data → Data Source Settings**
+   - Point to the `Dataset/retail_data.csv` file
+4. Click **Refresh** and explore the dashboard
+
+---
+
+## 💡 Key Insights
+
+- Top 3 product categories contribute **~65% of total revenue**
+- High-value customers (top 10%) account for **~40% of total sales**
+- Q4 consistently shows the **highest revenue** — driven by festive/seasonal demand
+- Month-over-Month growth shows a **consistent upward trend** in the last 6 months
+- 3 underperforming regions identified with **negative MoM growth** — flagged for review
+
+> ⚠️ Update these with your actual numbers from the dashboard before publishing.
+
+---
+
+## 📈 Skills Demonstrated
+
+- ✅ Data Cleaning & Transformation using Power Query
+- ✅ Star Schema Data Modelling
+- ✅ Advanced DAX (Time Intelligence, CALCULATE, Iterator functions)
+- ✅ KPI Design and Business Storytelling
+- ✅ Interactive Slicers and Cross-filtering
+- ✅ Customer Segmentation Analysis
+- ✅ Product and Sales Performance Analysis
+
+---
+
+## 👤 Author
+
+**Prem Bhosale**
+Data Analyst | Power BI | SQL | Python | Tableau
+
+🌐 [Portfolio](https://data-portfolio-site--prembhosale.replit.app/)
+💼 [LinkedIn](https://www.linkedin.com/in/YOUR_LINKEDIN_HERE)
+📧 [Email](mailto:YOUR_EMAIL_HERE)
+
+---
+
+> ⭐ If you found this project helpful or interesting, consider giving it a star — it helps others discover it!
